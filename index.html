@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Panda Tasks">
+  <meta name="theme-color" content="#5a9e6f">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Panda Tasks 🐼</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --pg:#5a9e6f;--pgl:#e8f5ed;--pgd:#2d6a45;--pa:#f7c948;--pal:#fef8e1;
+      --pb:#1a1a1a;--pgr:#8a8a8a;
+    }
+    html,body{min-height:100vh;background:#e8f5ed;font-family:'Nunito',sans-serif;color:#1a1a1a;}
+
+    .bg-wrap{position:relative;min-height:100vh;background:#e8f5ed;overflow-x:hidden;}
+    .bg-deco{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+    .bamboo-stalk{position:absolute;bottom:0;display:flex;flex-direction:column;align-items:center;}
+    .bnode{width:10px;border-radius:3px;background:#7bbf8e;}
+    .bseg{width:6px;background:#9dd4a8;}
+    .float-deco{position:absolute;font-size:16px;opacity:0.22;}
+
+    .app{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:1rem 1rem 5rem;}
+
+    .install-banner{display:none;align-items:center;gap:10px;background:rgba(255,255,255,0.95);border:1.5px solid var(--pg);border-radius:14px;padding:10px 14px;margin-bottom:1rem;}
+    .install-banner.show{display:flex;}
+    .install-banner p{font-size:13px;color:var(--pgd);font-weight:700;flex:1;}
+    .btn-install{padding:7px 14px;background:var(--pg);color:#fff;border:none;border-radius:9px;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;white-space:nowrap;}
+    .btn-dismiss{background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;padding:0;}
+
+    .header{display:flex;align-items:center;gap:12px;margin-bottom:1.2rem;padding:12px 14px;background:rgba(255,255,255,0.85);border-radius:16px;border:1.5px solid rgba(90,158,111,0.25);}
+    .panda-face{width:52px;height:52px;background:#fff;border-radius:50%;border:2.5px solid #1a1a1a;position:relative;flex-shrink:0;}
+    .panda-ear{width:14px;height:14px;background:#1a1a1a;border-radius:50%;position:absolute;top:-4px;}
+    .panda-ear.l{left:4px;}.panda-ear.r{right:4px;}
+    .panda-eye{width:10px;height:10px;background:#1a1a1a;border-radius:50%;position:absolute;top:16px;}
+    .panda-eye.l{left:12px;}.panda-eye.r{right:12px;}
+    .panda-nose{width:6px;height:4px;background:#1a1a1a;border-radius:50%;position:absolute;top:26px;left:50%;transform:translateX(-50%);}
+    .panda-cheek{width:8px;height:5px;background:#ffb3ba;border-radius:50%;position:absolute;top:26px;opacity:0.7;}
+    .panda-cheek.l{left:8px;}.panda-cheek.r{right:8px;}
+    .header-text h1{font-family:'Fredoka One',cursive;font-size:22px;color:#1a1a1a;}
+    .header-text p{font-size:12px;color:#5a7a66;}
+
+    .points-bar{background:rgba(255,255,255,0.88);border:1.5px solid var(--pg);border-radius:14px;padding:10px 16px;margin-bottom:1.2rem;display:flex;align-items:center;gap:10px;}
+    .pts-label{font-size:13px;color:var(--pgd);font-weight:700;}
+    .pts-val{font-family:'Fredoka One',cursive;font-size:26px;color:var(--pgd);margin-left:auto;}
+
+    .tabs{display:flex;gap:6px;margin-bottom:1.1rem;}
+    .tab{flex:1;padding:8px 10px;border-radius:20px;border:1.5px solid rgba(90,158,111,0.3);background:rgba(255,255,255,0.75);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:#5a7a66;transition:all 0.15s;text-align:center;}
+    .tab.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+
+    .section{display:none;}.section.active{display:block;}
+
+    .form-card{background:rgba(255,255,255,0.88);border:1.5px dashed rgba(90,158,111,0.4);border-radius:14px;padding:13px;margin-bottom:1rem;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+    .form-row.three{grid-template-columns:1fr 1fr 56px;}
+    input[type=text],input[type=date],input[type=number],select{
+      width:100%;padding:9px 10px;border:1.5px solid #c8e0d0;border-radius:8px;
+      font-family:'Nunito',sans-serif;font-size:14px;background:#fff;color:#1a1a1a;outline:none;
+      -webkit-appearance:none;appearance:none;
+    }
+    input:focus,select:focus{border-color:var(--pg);}
+    .btn-add{width:100%;padding:10px;background:var(--pg);color:#fff;border:none;border-radius:9px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;}
+
+    .filter-row{display:flex;gap:5px;margin-bottom:9px;flex-wrap:wrap;}
+    .filter-btn{padding:5px 12px;border-radius:14px;border:1px solid #c8e0d0;background:rgba(255,255,255,0.8);font-size:12px;font-weight:700;cursor:pointer;color:#5a7a66;}
+    .filter-btn.active{background:var(--pa);border-color:#e6b500;color:#5a3e00;}
+
+    .task-list{display:flex;flex-direction:column;gap:7px;}
+    .task-item{background:rgba(255,255,255,0.88);border:1.5px solid #d4e8da;border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:9px;}
+    .task-item.done{opacity:0.5;}
+    .task-check{width:26px;height:26px;border-radius:50%;border:2px solid #c8e0d0;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:#fff;}
+    .task-check.checked{background:var(--pg);border-color:var(--pg);color:#fff;}
+    .task-info{flex:1;min-width:0;}
+    .task-title{font-size:14px;font-weight:700;color:#1a1a1a;}
+    .task-meta{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;}
+    .badge{padding:2px 8px;border-radius:9px;font-size:11px;font-weight:700;}
+    .badge-cat{background:#d4f0e2;color:#1e5e38;}
+    .badge-date{background:#fff0e0;color:#a05000;}
+    .badge-date.ov{background:#fde0e0;color:#a00000;}
+    .badge-pts{background:#fef8e1;color:#7a5500;}
+    .btn-del{background:none;border:none;cursor:pointer;color:#bbb;font-size:18px;padding:0;line-height:1;flex-shrink:0;}
+
+    .empty{text-align:center;padding:2.5rem;color:#7aaa8a;font-size:14px;}
+    .empty-panda{font-size:40px;display:block;margin-bottom:8px;}
+
+    .rewards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+    .reward-card{background:rgba(255,255,255,0.88);border:1.5px solid #d4e8da;border-radius:13px;padding:12px;text-align:center;}
+    .reward-card.unlocked{border-color:var(--pg);background:rgba(232,245,237,0.95);}
+    .reward-card.redeemed{opacity:0.45;}
+    .reward-icon{font-size:30px;display:block;margin-bottom:5px;}
+    .reward-name{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+    .reward-cost{font-family:'Fredoka One',cursive;font-size:14px;color:#8a9a8a;}
+    .reward-cost.can{color:var(--pgd);}
+    .btn-redeem{margin-top:8px;width:100%;padding:7px;background:var(--pg);color:#fff;border:none;border-radius:8px;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;}
+    .btn-redeem:disabled{background:#ccc;cursor:not-allowed;}
+    .rew-add-form{background:rgba(255,255,255,0.85);border:1.5px dashed rgba(90,158,111,0.35);border-radius:13px;padding:14px;}
+    .rew-add-form h4{font-size:14px;font-weight:700;margin-bottom:10px;color:#1a1a1a;}
+    .rew-add-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:22px;font-size:14px;font-weight:700;transition:transform 0.3s;z-index:999;pointer-events:none;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+  </style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="bg-deco" id="bg-deco"></div>
+  <div class="app">
+
+    <div class="install-banner" id="install-banner">
+      <span style="font-size:22px;">🐼</span>
+      <p>¡Instala Panda Tasks en tu celular!</p>
+      <button class="btn-install" id="btn-install">Instalar</button>
+      <button class="btn-dismiss" id="btn-dismiss">✕</button>
+    </div>
+
+    <div class="header">
+      <div class="panda-face">
+        <div class="panda-ear l"></div><div class="panda-ear r"></div>
+        <div class="panda-eye l"></div><div class="panda-eye r"></div>
+        <div class="panda-nose"></div>
+        <div class="panda-cheek l"></div><div class="panda-cheek r"></div>
+      </div>
+      <div class="header-text">
+        <h1>Panda Tasks 🐼</h1>
+        <p>Completa tareas, gana bambú, canjea recompensas</p>
+      </div>
+    </div>
+
+    <div class="points-bar">
+      <span style="font-size:22px;">🎋</span>
+      <span class="pts-label">Bambú disponible</span>
+      <span class="pts-val" id="pts-display">0 pts</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tasks')">📋 Pendientes</button>
+      <button class="tab" onclick="switchTab('rewards')">🎁 Recompensas</button>
+    </div>
+
+    <div class="section active" id="tab-tasks">
+      <div class="form-card">
+        <div class="form-row">
+          <input type="text" id="task-title" placeholder="Nueva tarea...">
+          <select id="task-cat">
+            <option value="">-- Categoría --</option>
+            <option>Estudio</option><option>Trabajo</option><option>Salud</option>
+            <option>Hogar</option><option>Personal</option><option>Otro</option>
+          </select>
+        </div>
+        <div class="form-row three">
+          <input type="date" id="task-date">
+          <input type="number" id="task-pts" placeholder="Puntos" min="1" max="999">
+          <button class="btn-add" onclick="addTask()">+</button>
+        </div>
+      </div>
+      <div class="filter-row" id="filter-row"><button class="filter-btn active" onclick="setFilter('Todas')">Todas</button></div>
+      <div id="task-list" class="task-list"></div>
+    </div>
+
+    <div class="section" id="tab-rewards">
+      <div class="rewards-grid" id="rewards-grid"></div>
+      <div class="rew-add-form">
+        <h4>+ Nueva recompensa</h4>
+        <input type="text" id="rew-name" placeholder="Nombre de la recompensa" style="margin-bottom:8px;">
+        <div class="rew-add-row">
+          <input type="text" id="rew-icon" placeholder="Emoji (ej: 🍕)">
+          <input type="number" id="rew-cost" placeholder="Puntos necesarios" min="1">
+        </div>
+        <button class="btn-add" onclick="addReward()">Agregar recompensa</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  document.getElementById('install-banner').classList.add('show');
+});
+document.getElementById('btn-install').addEventListener('click',()=>{
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('install-banner').classList.remove('show');});}
+});
+document.getElementById('btn-dismiss').addEventListener('click',()=>{
+  document.getElementById('install-banner').classList.remove('show');
+});
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('install-banner').classList.remove('show');
+  showToast('¡App instalada! 🐼🎋');
+});
+
+const BAMBOOS=[
+  {x:2,h:260,leaves:[{top:40,rot:-30,side:'r'},{top:100,rot:25,side:'l'},{top:170,rot:-20,side:'r'}]},
+  {x:9,h:190,leaves:[{top:35,rot:28,side:'l'},{top:110,rot:-25,side:'r'}]},
+  {x:85,h:280,leaves:[{top:50,rot:-28,side:'r'},{top:120,rot:22,side:'l'},{top:200,rot:-18,side:'r'}]},
+  {x:92,h:210,leaves:[{top:60,rot:30,side:'l'},{top:150,rot:-26,side:'r'}]},
+  {x:78,h:150,leaves:[{top:40,rot:-20,side:'l'},{top:100,rot:18,side:'r'}]},
+  {x:16,h:140,leaves:[{top:30,rot:22,side:'r'},{top:90,rot:-18,side:'l'}]},
+];
+const FLOATS=[
+  {e:'🌿',x:22,y:12},{e:'🍃',x:55,y:6},{e:'🎋',x:38,y:22},
+  {e:'🌸',x:65,y:16},{e:'🐾',x:48,y:5},{e:'🌿',x:70,y:28},
+  {e:'🍀',x:30,y:32},{e:'🎋',x:16,y:38},{e:'🌸',x:83,y:8},
+  {e:'🐼',x:90,y:32},{e:'🍃',x:6,y:52},{e:'🌿',x:60,y:42},
+  {e:'🎋',x:44,y:55},{e:'🍀',x:72,y:50},{e:'🌸',x:25,y:60},
+];
+function buildBg(){
+  const d=document.getElementById('bg-deco');let html='';
+  BAMBOOS.forEach(b=>{
+    const segs=Math.floor(b.h/22);let stalk='';
+    for(let i=0;i<segs;i++) stalk+=`<div class="bseg" style="height:16px;"></div><div class="bnode" style="height:5px;"></div>`;
+    let leaves='';
+    b.leaves.forEach(l=>{
+      const side=l.side==='r'?'left:10px':'right:10px';
+      leaves+=`<span style="position:absolute;top:${l.top}px;${side};transform:rotate(${l.rot}deg);font-size:17px;opacity:0.55;">🍃</span>`;
+    });
+    html+=`<div class="bamboo-stalk" style="left:${b.x}%;height:${b.h}px;position:absolute;bottom:0;">${leaves}${stalk}</div>`;
+  });
+  FLOATS.forEach(f=>{html+=`<span class="float-deco" style="left:${f.x}%;top:${f.y}%;">${f.e}</span>`;});
+  d.innerHTML=html;
+}
+buildBg();
+
+let state={points:0,tasks:[],rewards:[
+  {id:1,name:'Episodio de serie',icon:'📺',cost:30,redeemed:false},
+  {id:2,name:'Snack favorito',icon:'🍫',cost:20,redeemed:false},
+  {id:3,name:'30 min de redes',icon:'📱',cost:15,redeemed:false},
+  {id:4,name:'Siesta de 20 min',icon:'😴',cost:25,redeemed:false},
+],filter:'Todas',nextTaskId:1,nextRewId:10};
+
+function save(){try{localStorage.setItem('pandatasks2',JSON.stringify(state));}catch(e){}}
+function load(){try{const d=localStorage.getItem('pandatasks2');if(d)state=JSON.parse(d);}catch(e){}}
+load();
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['tasks','rewards'][i]===t));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='rewards')renderRewards();else renderTasks();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function updatePoints(){
+  const e=state.tasks.filter(t=>t.done).reduce((s,t)=>s+t.pts,0);
+  const sp=state.rewards.filter(r=>r.redeemed).reduce((s,r)=>s+r.cost,0);
+  state.points=Math.max(0,e-sp);
+  document.getElementById('pts-display').textContent=state.points+' pts';
+}
+function setFilter(cat){
+  state.filter=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.textContent===cat));
+  renderTasks();
+}
+function renderFilters(){
+  const cats=[...new Set(state.tasks.map(t=>t.cat).filter(Boolean))];
+  const row=document.getElementById('filter-row');
+  row.innerHTML='<button class="filter-btn'+(state.filter==='Todas'?' active':'')+'" onclick="setFilter(\'Todas\')">Todas</button>';
+  cats.forEach(c=>row.innerHTML+='<button class="filter-btn'+(state.filter===c?' active':'')+'" onclick="setFilter(\''+c+'\')">'+c+'</button>');
+}
+function isOv(d){return d&&new Date(d+'T23:59:59')<new Date();}
+function fmtD(d){return d?new Date(d+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'}):null;}
+function renderTasks(){
+  renderFilters();
+  const list=document.getElementById('task-list');
+  let tasks=state.filter==='Todas'?state.tasks:state.tasks.filter(t=>t.cat===state.filter);
+  tasks=[...tasks].sort((a,b)=>a.done-b.done);
+  if(!tasks.length){list.innerHTML='<div class="empty"><span class="empty-panda">🐼</span>El panda espera tus tareas...</div>';return;}
+  list.innerHTML=tasks.map(t=>`
+    <div class="task-item${t.done?' done':''}">
+      <div class="task-check${t.done?' checked':''}" onclick="toggleTask(${t.id})">${t.done?'✓':''}</div>
+      <div class="task-info">
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta">
+          ${t.cat?`<span class="badge badge-cat">${t.cat}</span>`:''}
+          ${t.date?`<span class="badge badge-date${isOv(t.date)&&!t.done?' ov':''}">${isOv(t.date)&&!t.done?'⚠ ':''}${fmtD(t.date)}</span>`:''}
+          <span class="badge badge-pts">🎋 ${t.pts}</span>
+        </div>
+      </div>
+      <button class="btn-del" onclick="deleteTask(${t.id})">✕</button>
+    </div>`).join('');
+}
+function addTask(){
+  const title=document.getElementById('task-title').value.trim();
+  const cat=document.getElementById('task-cat').value;
+  const date=document.getElementById('task-date').value;
+  const pts=parseInt(document.getElementById('task-pts').value)||10;
+  if(!title){showToast('Escribe el nombre de la tarea 🐼');return;}
+  state.tasks.push({id:state.nextTaskId++,title,cat,date,pts,done:false});
+  ['task-title','task-cat','task-date','task-pts'].forEach(id=>{document.getElementById(id).value='';});
+  save();renderTasks();updatePoints();showToast('Tarea agregada 🎋');
+}
+function toggleTask(id){
+  const t=state.tasks.find(x=>x.id===id);if(!t)return;
+  t.done=!t.done;save();updatePoints();renderTasks();
+  if(t.done)showToast('+'+t.pts+' bambú ganado! 🎋');
+}
+function deleteTask(id){state.tasks=state.tasks.filter(x=>x.id!==id);save();updatePoints();renderTasks();}
+function renderRewards(){
+  document.getElementById('rewards-grid').innerHTML=state.rewards.map(r=>{
+    const can=!r.redeemed&&state.points>=r.cost;
+    return`<div class="reward-card${can?' unlocked':''}${r.redeemed?' redeemed':''}">
+      <span class="reward-icon">${r.icon||'🎁'}</span>
+      <div class="reward-name">${r.name}</div>
+      <div class="reward-cost${can?' can':''}">🎋 ${r.cost} pts</div>
+      <button class="btn-redeem" onclick="redeem(${r.id})" ${r.redeemed||!can?'disabled':''}>
+        ${r.redeemed?'Canjeado ✓':'Canjear'}</button>
+    </div>`;
+  }).join('');
+}
+function redeem(id){
+  const r=state.rewards.find(x=>x.id===id);
+  if(!r||r.redeemed||state.points<r.cost)return;
+  r.redeemed=true;save();updatePoints();renderRewards();showToast('¡Recompensa canjeada! '+r.icon);
+}
+function addReward(){
+  const name=document.getElementById('rew-name').value.trim();
+  const icon=document.getElementById('rew-icon').value.trim()||'🎁';
+  const cost=parseInt(document.getElementById('rew-cost').value)||50;
+  if(!name){showToast('Escribe el nombre de la recompensa');return;}
+  state.rewards.push({id:state.nextRewId++,name,icon,cost,redeemed:false});
+  ['rew-name','rew-icon','rew-cost'].forEach(id=>{document.getElementById(id).value='';});
+  save();renderRewards();showToast('Recompensa agregada 🎁');
+}
+updatePoints();renderTasks();
+</script>
+</body>
+</html>
