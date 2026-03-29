@@ -278,7 +278,7 @@ function renderTasks(){
   const list=document.getElementById('task-list');
   let tasks=state.filter==='Todas'?state.tasks:state.tasks.filter(t=>t.cat===state.filter);
   tasks=[...tasks].sort((a,b)=>a.done-b.done);
-  if(!tasks.length){list.innerHTML='<div class="empty"><span class="empty-panda">🐼</span>El panda espera tus tareas...</div>';return;}
+  if(!tasks.length){list.innerHTML='<div class="empty"><span class="empty-panda">🐼</span>Pandi espera tus tareas...</div>';return;}
   list.innerHTML=tasks.map(t=>`
     <div class="task-item${t.done?' done':''}">
       <div class="task-check${t.done?' checked':''}" onclick="toggleTask(${t.id})">${t.done?'✓':''}</div>
